@@ -1,0 +1,10 @@
+name: pulumi-static-site
+description: Static Website with S3 and Cloudfront
+runtime:
+  name: nodejs
+  options:
+    packagemanager: npm
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-typescript
