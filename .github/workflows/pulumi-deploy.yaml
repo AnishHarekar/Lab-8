@@ -34,7 +34,7 @@ jobs:
         uses: pulumi/actions@v4
         with:
           command: up
-          stack: YOUR_PULUMI_STACK
+          stack: dev
           cloud-url: pulumi://YOUR_ORG/YOUR_PROJECT
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
