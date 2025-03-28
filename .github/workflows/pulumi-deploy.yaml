@@ -26,11 +26,12 @@ jobs:
           curl -fsSL https://get.pulumi.com | sh
           export PATH=$HOME/.pulumi/bin:$PATH
 
-      - name: Setup AWS Credentials (if using AWS)
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/YOUR_PULUMI_ROLE
-          aws-region: us-east-1  # Change to your region
+          role-to-assume: arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/GitHubActionsRole
+          role-session-name: GitHubActions
+          aws-region: us-east-1
 
       - name: Install Dependencies
         run: npm install
