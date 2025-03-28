@@ -2,7 +2,7 @@ import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 
 // Create an S3 bucket for the static website
-const bucket = new aws.s3.Bucket("my-static-website-bucket", {
+const bucket = new aws.s3.Bucket("harekar-static-website-bucket", {
     website: {
         indexDocument: "index.html",
     },
