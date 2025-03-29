@@ -28,8 +28,9 @@ jobs:
           cat token_response.json
           TOKEN=$(jq -r '.value' token_response.json | tr -d '\n\r\t ')
           echo "Extracted token (length): ${#TOKEN}"
-          printf '%s' "$TOKEN" | jq -r 'split(".")[1] | @base64d | fromjson | .sub' || echo "Failed to decode sub"
-          printf '%s' "$TOKEN" | jq -r 'split(".")[1] | @base64d | fromjson | .aud' || echo "Failed to decode aud"
+          echo "$TOKEN" > token.txt
+          jq -r 'split(".")[1] | @base64d | fromjson | .sub' token.txt || echo "Failed to decode sub"
+          jq -r 'split(".")[1] | @base64d | fromjson | .aud' token.txt || echo "Failed to decode aud"
         env:
           ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
           ACTIONS_ID_TOKEN_REQUEST_URL: ${{ env.ACTIONS_ID_TOKEN_REQUEST_URL }}
