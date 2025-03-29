@@ -1,4 +1,4 @@
-name: pulumi-static-site
+name: Lab-8
 description: Static Website with S3 and Cloudfront
 runtime:
   name: nodejs
