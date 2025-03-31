@@ -1,23 +1,37 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 
-// S3 Bucket
+// Create an S3 bucket for the static website
 const bucket = new aws.s3.Bucket("my-static-website-bucket", {
     website: {
         indexDocument: "index.html",
     },
 });
 
-// S3 Object
+// Bucket Policy to allow public read access
+const bucketPolicy = new aws.s3.BucketPolicy("my-bucket-policy", {
+    bucket: bucket.id,
+    policy: bucket.id.apply(bucketName => JSON.stringify({
+        Version: "2012-10-17",
+        Statement: [{
+            Effect: "Allow",
+            Principal: "*",
+            Action: ["s3:GetObject"],
+            Resource: [`arn:aws:s3:::${bucketName}/*`],
+        }],
+    })),
+});
+
+// Upload a sample index.html file to the bucket (no ACL)
 const indexContent = `<html><body><h1>Hello from Pulumi Static Site!</h1></body></html>`;
 const indexObject = new aws.s3.BucketObject("index.html", {
     bucket: bucket.id,
     content: indexContent,
     contentType: "text/html",
-    acl: "public-read",
+    // Removed acl: "public-read" since we use a bucket policy instead
 });
 
-// CloudFront Distribution with 'restrictions'
+// Create a CloudFront distribution
 const distribution = new aws.cloudfront.Distribution("my-distribution", {
     enabled: true,
     origins: [{
@@ -44,7 +58,7 @@ const distribution = new aws.cloudfront.Distribution("my-distribution", {
     },
     restrictions: {
         geoRestriction: {
-            restrictionType: "none", // No geographic restrictions
+            restrictionType: "none",
         },
     },
 });
