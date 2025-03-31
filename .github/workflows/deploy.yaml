@@ -1,9 +1,13 @@
-name: Deploy Static Website
+name: Deploy Static Website with OIDC
 
 on:
   push:
     branches:
       - main
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   deploy:
@@ -20,6 +24,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1  # Hardcode region here
+          role-to-assume: arn:aws:iam::<your-aws-account-id>:role/GitHubActionsRole
+          role-session-name: GitHubActions
+
       - name: Deploy with Pulumi
         uses: pulumi/actions@v6
         with:
@@ -27,5 +38,4 @@ jobs:
           stack-name: dev
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "us-east-1"  # Add as environment variable
