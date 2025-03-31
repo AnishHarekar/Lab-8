@@ -6,8 +6,8 @@ on:
       - main
 
 permissions:
-  contents: read
   id-token: write
+  contents: read
 
 jobs:
   deploy:
@@ -27,9 +27,15 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: us-east-1  # Hardcode region here
-          role-to-assume: arn:aws:iam::992382594826:role/GitHubActionsRole
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::<your-aws-account-id>:role/MyGitHubRole
           role-session-name: GitHubActions
+          audience: sts.amazonaws.com
+
+      - name: Inject ESC Environment Variables
+        uses: pulumi/esc-action@v1
+        with:
+          environment: <your-pulumi-org>/aws-static-site-env
 
       - name: Deploy with Pulumi
         uses: pulumi/actions@v6
@@ -38,4 +44,3 @@ jobs:
           stack-name: dev
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          AWS_REGION: "us-east-1"  # Add as environment variable
