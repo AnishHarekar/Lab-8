@@ -1,46 +1,54 @@
-name: Deploy Static Website with OIDC
+import * as aws from "@pulumi/aws";
+import * as pulumi from "@pulumi/pulumi";
 
-on:
-  push:
-    branches:
-      - main
+// S3 Bucket
+const bucket = new aws.s3.Bucket("my-static-website-bucket", {
+    website: {
+        indexDocument: "index.html",
+    },
+});
 
-permissions:
-  id-token: write
-  contents: read
+// S3 Object
+const indexContent = `<html><body><h1>Hello from Pulumi Static Site!</h1></body></html>`;
+const indexObject = new aws.s3.BucketObject("index.html", {
+    bucket: bucket.id,
+    content: indexContent,
+    contentType: "text/html",
+    acl: "public-read",
+});
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    env:
-      PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+// CloudFront Distribution with 'restrictions'
+const distribution = new aws.cloudfront.Distribution("my-distribution", {
+    enabled: true,
+    origins: [{
+        domainName: bucket.bucketRegionalDomainName,
+        originId: bucket.arn,
+    }],
+    defaultRootObject: "index.html",
+    defaultCacheBehavior: {
+        targetOriginId: bucket.arn,
+        viewerProtocolPolicy: "redirect-to-https",
+        allowedMethods: ["GET", "HEAD", "OPTIONS"],
+        cachedMethods: ["GET", "HEAD", "OPTIONS"],
+        forwardedValues: {
+            queryString: false,
+            cookies: { forward: "none" },
+        },
+        minTtl: 0,
+        defaultTtl: 3600,
+        maxTtl: 86400,
+    },
+    priceClass: "PriceClass_100",
+    viewerCertificate: {
+        cloudfrontDefaultCertificate: true,
+    },
+    restrictions: {
+        geoRestriction: {
+            restrictionType: "none", // No geographic restrictions
+        },
+    },
+});
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: us-east-1
-          role-to-assume: arn:aws:iam::992382594826:role/GithubActionsRole
-          role-session-name: GitHubActions
-          audience: sts.amazonaws.com
-
-      - name: Inject ESC Environment Variables
-        uses: pulumi/esc-action@v1
-        with:
-          environment: AnishHarekar/aws-static-site-env/Lab-8
-
-      - name: Deploy with Pulumi
-        uses: pulumi/actions@v6
-        with:
-          command: up
-          stack-name: dev
+// Exports
+export const bucketName = bucket.id;
+export const cloudfrontUrl = distribution.domainName;
