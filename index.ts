@@ -1,6 +1,9 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 
+const awsConfig = new aws.Config();
+awsConfig.region = "us-east-1";
+
 // Create an S3 bucket for the static website
 const bucket = new aws.s3.Bucket("my-static-website-bucket", {
     website: {
