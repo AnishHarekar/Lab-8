@@ -28,14 +28,14 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
-          role-to-assume: arn:aws:iam::<your-aws-account-id>:role/MyGitHubRole
+          role-to-assume: arn:aws:iam::992382594826:role/GithubActionsRole
           role-session-name: GitHubActions
           audience: sts.amazonaws.com
 
       - name: Inject ESC Environment Variables
         uses: pulumi/esc-action@v1
         with:
-          environment: <your-pulumi-org>/aws-static-site-env
+          environment: AnishHarekar/aws-static-site-env
 
       - name: Deploy with Pulumi
         uses: pulumi/actions@v6
