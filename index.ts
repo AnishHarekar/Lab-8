@@ -1,17 +1,14 @@
 import * as aws from "@pulumi/aws";
 import * as pulumi from "@pulumi/pulumi";
 
-const awsConfig = new aws.Config();
-awsConfig.region = "us-east-1";
-
-// Create an S3 bucket for the static website
+// S3 Bucket
 const bucket = new aws.s3.Bucket("my-static-website-bucket", {
     website: {
         indexDocument: "index.html",
     },
 });
 
-// Upload a sample index.html file to the bucket
+// S3 Object
 const indexContent = `<html><body><h1>Hello from Pulumi Static Site!</h1></body></html>`;
 const indexObject = new aws.s3.BucketObject("index.html", {
     bucket: bucket.id,
@@ -20,7 +17,7 @@ const indexObject = new aws.s3.BucketObject("index.html", {
     acl: "public-read",
 });
 
-// Create a CloudFront distribution
+// CloudFront Distribution with 'restrictions'
 const distribution = new aws.cloudfront.Distribution("my-distribution", {
     enabled: true,
     origins: [{
@@ -45,8 +42,13 @@ const distribution = new aws.cloudfront.Distribution("my-distribution", {
     viewerCertificate: {
         cloudfrontDefaultCertificate: true,
     },
+    restrictions: {
+        geoRestriction: {
+            restrictionType: "none", // No geographic restrictions
+        },
+    },
 });
 
-// Export the bucket name and CloudFront URL
+// Exports
 export const bucketName = bucket.id;
 export const cloudfrontUrl = distribution.domainName;
