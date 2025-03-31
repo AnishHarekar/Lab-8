@@ -35,7 +35,7 @@ jobs:
       - name: Inject ESC Environment Variables
         uses: pulumi/esc-action@v1
         with:
-          environment: AnishHarekar/aws-static-site-env
+          environment: AnishHarekar/aws-static-site-env/Lab-8
 
       - name: Deploy with Pulumi
         uses: pulumi/actions@v6
