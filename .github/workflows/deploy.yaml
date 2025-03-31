@@ -25,10 +25,10 @@ jobs:
         run: npm install
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1  # Hardcode region here
-          role-to-assume: arn:aws:iam::<your-aws-account-id>:role/GitHubActionsRole
+          role-to-assume: arn:aws:iam::992382594826:role/GitHubActionsRole
           role-session-name: GitHubActions
 
       - name: Deploy with Pulumi
